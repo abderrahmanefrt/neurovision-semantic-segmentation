@@ -79,4 +79,31 @@ class Decoder(nn.Module):
 
 # Define the FCN model
 
-class FCN
+class FCN(nn.Module):
+   def __init__(self,num_classes):
+       super().__init__()
+       self.encoder = encoder()
+       self.decoder = Decoder()
+       # classification pixel-wise
+       self.classifier = nn.Conv2d(64, num_classes, kernel_size=1)
+
+       def forward(self, x):
+
+         x1, x2, x3, bottleneck = self.encoder(x)
+
+         x = self.decoder(bottleneck, x1, x2, x3)
+
+         x = self.classifier(x)
+
+         return x
+       
+
+
+
+model = FCN(num_classes=4)
+
+x = torch.randn(1, 3, 256, 256)
+
+out = model(x)
+
+print(out.shape)

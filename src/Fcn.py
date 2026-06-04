@@ -45,7 +45,34 @@ class encoder(nn.Module):
 
 #decoder block
 
+class Decoder(nn.Module):
+    def __init__(self):
+        super().__init__()
 
+        self.up3 = nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2)
+        self.dec3 = conv_block(256, 128)
+
+        self.up2 = nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2)
+        self.dec2 = conv_block(128, 64)
+
+        self.up1 = nn.ConvTranspose2d(64, 64, kernel_size=2, stride=2)
+        self.dec1 = conv_block(128, 64)
+
+    def forward(self, x, x1, x2, x3):
+
+        d3 = self.up3(x)
+        d3 = torch.cat([d3, x3], dim=1)  # skip connection
+        d3 = self.dec3(d3)
+
+        d2 = self.up2(d3)
+        d2 = torch.cat([d2, x2], dim=1)
+        d2 = self.dec2(d2)
+
+        d1 = self.up1(d2)
+        d1 = torch.cat([d1, x1], dim=1)
+        d1 = self.dec1(d1)
+
+        return d1
 
 
 
